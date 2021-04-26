@@ -40,6 +40,7 @@
                         >
                             <van-radio name="建议">建议</van-radio>
                             <van-radio name="投诉">投诉</van-radio>
+                            <van-radio name="其他">其他</van-radio>
                         </van-radio-group>
                     </template>
                 </van-field>
@@ -90,8 +91,9 @@ import fetch from "../api/fetch";
 import Headbar from "../components/Headbar";
 import Vue from "vue";
 import axios from 'axios'
-import {HOST} from './host'
+import {HOST} from '../api/host'
 import { Form, Field, Uploader, Button, RadioGroup, Radio, Toast } from "vant";
+
 
 Vue.use(Form).use(Field).use(Uploader).use(Button).use(Radio).use(RadioGroup).use(Toast);
 
@@ -105,13 +107,8 @@ export default {
             pics: [], //图片
             attachments: [], //附件
             advanceType: "", //建议类型
-            uploader: [
-                {
-                    url:
-                        "",
-                },
-            ],
-            uploaderfiles: [{}],
+            uploader: [],
+            uploaderfiles: [],
 
             heightstyle: {
                 height: "300px",
@@ -127,15 +124,26 @@ export default {
     },
     methods: {
         onSubmit(values) {
+            // console.log('uploader:',this.uploader);
+            
+            // this.attachments.map((item,index)=>item.file)
+            // console.log("upload_map:",uploader)
             const formData=new FormData()
-            formData.append("department",this.department);
-            formData.append("linkman",this.linkman);
-            formData.append("phone",this.phone);
-            formData.append("advanceType",this.advanceType);
-            formData.append("content",this.content);
-            formData.append("pics",this.pics);
-            formData.append("attachments",this.attachments);
-            axios.post(`${HOST}/`,formData,{
+            formData.append("enterprise_name",this.department);
+            formData.append("name",this.linkman);
+            formData.append("contact_way",this.phone);
+            formData.append("talks_type",this.advanceType);
+            formData.append("detail",this.content);
+            // formData.append("attachment_pic",uploader);
+            
+            // formData.append("attachment_file",attachments);
+            this.uploader.map((item,index)=>{
+                formData.append(`image${index}`,item.file);
+                })
+            this.attachments.map((item,index)=>{
+                formData.append(`file${index}`,item.file);
+                })
+            axios.post(`${HOST}/talks`,formData,{
                 header:{
                     "content-type":"multipart/form-data"
                 }
